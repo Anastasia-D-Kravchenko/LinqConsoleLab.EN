@@ -111,37 +111,22 @@ public sealed class LinqExercises
             select $"{g.Key}: {g.Average(e => e.FinalGrade):F2}";
     }
 
-    /// <summary>
-    /// Task:
-    /// For each lecturer, count how many courses are assigned to that lecturer.
-    /// Return the full lecturer name and the course count.
-    ///
-    /// SQL:
-    /// SELECT l.FirstName, l.LastName, COUNT(c.Id)
-    /// FROM Lecturers l
-    /// LEFT JOIN Courses c ON c.LecturerId = l.Id
-    /// GROUP BY l.FirstName, l.LastName;
-    /// </summary>
     public IEnumerable<string> Task15_LecturersAndCourseCounts()
     {
-        throw NotImplemented(nameof(Task15_LecturersAndCourseCounts));
+        return UniversityData.Lecturers
+            .GroupJoin(UniversityData.Courses, 
+                l => l.Id, 
+                c => c.LecturerId, 
+                (l, courses) => $"{l.FirstName} {l.LastName}: {courses.Count()} courses");
     }
 
-    /// <summary>
-    /// Task:
-    /// For each student, find the highest final grade.
-    /// Skip students who do not have any graded enrollment yet.
-    ///
-    /// SQL:
-    /// SELECT s.FirstName, s.LastName, MAX(e.FinalGrade)
-    /// FROM Students s
-    /// JOIN Enrollments e ON s.Id = e.StudentId
-    /// WHERE e.FinalGrade IS NOT NULL
-    /// GROUP BY s.FirstName, s.LastName;
-    /// </summary>
     public IEnumerable<string> Task16_HighestGradePerStudent()
     {
-        throw NotImplemented(nameof(Task16_HighestGradePerStudent));
+        return from e in UniversityData.Enrollments
+            where e.FinalGrade.HasValue
+            join s in UniversityData.Students on e.StudentId equals s.Id
+            group e by new { s.FirstName, s.LastName } into g
+            select $"{g.Key.FirstName} {g.Key.LastName}: {g.Max(e => e.FinalGrade):F2}";
     }
 
     /// <summary>
