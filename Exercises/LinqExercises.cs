@@ -77,35 +77,21 @@ public sealed class LinqExercises
             .Select(c => $"{c.Title} ({c.Category})");
     }
 
-    /// <summary>
-    /// Task:
-    /// Join students with enrollments by StudentId.
-    /// Return the full student name and the enrollment date.
-    ///
-    /// SQL:
-    /// SELECT s.FirstName, s.LastName, e.EnrollmentDate
-    /// FROM Students s
-    /// JOIN Enrollments e ON s.Id = e.StudentId;
-    /// </summary>
     public IEnumerable<string> Task11_JoinStudentsWithEnrollments()
     {
-        throw NotImplemented(nameof(Task11_JoinStudentsWithEnrollments));
+        return UniversityData.Students
+            .Join(UniversityData.Enrollments, 
+                s => s.Id, 
+                e => e.StudentId, 
+                (s, e) => $"{s.FirstName} {s.LastName} enrolled on {e.EnrollmentDate:yyyy-MM-dd}");
     }
 
-    /// <summary>
-    /// Task:
-    /// Prepare all student-course pairs based on enrollments.
-    /// Use an approach that flattens the data into a single result sequence.
-    ///
-    /// SQL:
-    /// SELECT s.FirstName, s.LastName, c.Title
-    /// FROM Enrollments e
-    /// JOIN Students s ON s.Id = e.StudentId
-    /// JOIN Courses c ON c.Id = e.CourseId;
-    /// </summary>
     public IEnumerable<string> Task12_StudentCoursePairs()
     {
-        throw NotImplemented(nameof(Task12_StudentCoursePairs));
+        return from e in UniversityData.Enrollments
+            join s in UniversityData.Students on e.StudentId equals s.Id
+            join c in UniversityData.Courses on e.CourseId equals c.Id
+            select $"{s.FirstName} {s.LastName} - {c.Title}";
     }
 
     /// <summary>
