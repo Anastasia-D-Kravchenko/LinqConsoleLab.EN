@@ -94,36 +94,21 @@ public sealed class LinqExercises
             select $"{s.FirstName} {s.LastName} - {c.Title}";
     }
 
-    /// <summary>
-    /// Task:
-    /// Group enrollments by course and return the course title together with the number of enrollments.
-    ///
-    /// SQL:
-    /// SELECT c.Title, COUNT(*)
-    /// FROM Enrollments e
-    /// JOIN Courses c ON c.Id = e.CourseId
-    /// GROUP BY c.Title;
-    /// </summary>
     public IEnumerable<string> Task13_GroupEnrollmentsByCourse()
     {
-        throw NotImplemented(nameof(Task13_GroupEnrollmentsByCourse));
+        return from e in UniversityData.Enrollments
+            join c in UniversityData.Courses on e.CourseId equals c.Id
+            group e by c.Title into g
+            select $"{g.Key}: {g.Count()} enrollments";
     }
 
-    /// <summary>
-    /// Task:
-    /// Calculate the average final grade for each course.
-    /// Ignore records where the final grade is null.
-    ///
-    /// SQL:
-    /// SELECT c.Title, AVG(e.FinalGrade)
-    /// FROM Enrollments e
-    /// JOIN Courses c ON c.Id = e.CourseId
-    /// WHERE e.FinalGrade IS NOT NULL
-    /// GROUP BY c.Title;
-    /// </summary>
     public IEnumerable<string> Task14_AverageGradePerCourse()
     {
-        throw NotImplemented(nameof(Task14_AverageGradePerCourse));
+        return from e in UniversityData.Enrollments
+            where e.FinalGrade.HasValue
+            join c in UniversityData.Courses on e.CourseId equals c.Id
+            group e by c.Title into g
+            select $"{g.Key}: {g.Average(e => e.FinalGrade):F2}";
     }
 
     /// <summary>
