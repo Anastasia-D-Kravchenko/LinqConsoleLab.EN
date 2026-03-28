@@ -4,19 +4,11 @@ namespace LinqConsoleLab.EN.Exercises;
 
 public sealed class LinqExercises
 {
-    /// <summary>
-    /// Task:
-    /// Find all students who live in Warsaw.
-    /// Return the index number, full name, and city.
-    ///
-    /// SQL:
-    /// SELECT IndexNumber, FirstName, LastName, City
-    /// FROM Students
-    /// WHERE City = 'Warsaw';
-    /// </summary>
     public IEnumerable<string> Task01_StudentsFromWarsaw()
     {
-        throw NotImplemented(nameof(Task01_StudentsFromWarsaw));
+        return UniversityData.Students
+            .Where(s => s.City == "Warsaw")
+            .Select(s => $"{s.IndexNumber} - {s.FirstName} {s.LastName}");
     }
 
     /// <summary>
