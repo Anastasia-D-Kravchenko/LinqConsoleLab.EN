@@ -25,19 +25,13 @@ public sealed class LinqExercises
             .Select(s => $"{s.IndexNumber} - {s.FirstName} {s.LastName}");
     }
 
-    /// <summary>
-    /// Task:
-    /// Find the first course from the Analytics category.
-    /// If such a course does not exist, return a text message.
-    ///
-    /// SQL:
-    /// SELECT TOP 1 Title, StartDate
-    /// FROM Courses
-    /// WHERE Category = 'Analytics';
-    /// </summary>
     public IEnumerable<string> Task04_FirstAnalyticsCourse()
     {
-        throw NotImplemented(nameof(Task04_FirstAnalyticsCourse));
+        var course = UniversityData.Courses.FirstOrDefault(c => c.Category == "Analytics");
+        
+        return course != null 
+            ? new[] { $"{course.Title} ({course.StartDate:yyyy-MM-dd})" } 
+            : new[] { "No Analytics course found." };
     }
 
     /// <summary>
