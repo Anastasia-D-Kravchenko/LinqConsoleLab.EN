@@ -129,39 +129,24 @@ public sealed class LinqExercises
             select $"{g.Key.FirstName} {g.Key.LastName}: {g.Max(e => e.FinalGrade):F2}";
     }
 
-    /// <summary>
-    /// Challenge:
-    /// Find students who have more than one active enrollment.
-    /// Return the full name and the number of active courses.
-    ///
-    /// SQL:
-    /// SELECT s.FirstName, s.LastName, COUNT(*)
-    /// FROM Students s
-    /// JOIN Enrollments e ON s.Id = e.StudentId
-    /// WHERE e.IsActive = 1
-    /// GROUP BY s.FirstName, s.LastName
-    /// HAVING COUNT(*) > 1;
-    /// </summary>
     public IEnumerable<string> Challenge01_StudentsWithMoreThanOneActiveCourse()
     {
-        throw NotImplemented(nameof(Challenge01_StudentsWithMoreThanOneActiveCourse));
+        return from e in UniversityData.Enrollments
+            where e.IsActive
+            join s in UniversityData.Students on e.StudentId equals s.Id
+            group e by new { s.FirstName, s.LastName } into g
+            where g.Count() > 1
+            select $"{g.Key.FirstName} {g.Key.LastName}: {g.Count()} active courses";
     }
 
-    /// <summary>
-    /// Challenge:
-    /// List the courses that start in April 2026 and do not have any final grades assigned yet.
-    ///
-    /// SQL:
-    /// SELECT c.Title
-    /// FROM Courses c
-    /// JOIN Enrollments e ON c.Id = e.CourseId
-    /// WHERE MONTH(c.StartDate) = 4 AND YEAR(c.StartDate) = 2026
-    /// GROUP BY c.Title
-    /// HAVING SUM(CASE WHEN e.FinalGrade IS NOT NULL THEN 1 ELSE 0 END) = 0;
-    /// </summary>
     public IEnumerable<string> Challenge02_AprilCoursesWithoutFinalGrades()
     {
-        throw NotImplemented(nameof(Challenge02_AprilCoursesWithoutFinalGrades));
+        return from c in UniversityData.Courses
+            where c.StartDate.Year == 2026 && c.StartDate.Month == 4
+            join e in UniversityData.Enrollments on c.Id equals e.CourseId
+            group e by c.Title into g
+            where g.All(e => !e.FinalGrade.HasValue) // Or `g.Count(e => e.FinalGrade.HasValue) == 0`
+            select g.Key;
     }
 
     /// <summary>
