@@ -46,63 +46,35 @@ public sealed class LinqExercises
         return new[] { allHaveDepartment ? "Yes" : "No" };
     }
 
-    /// <summary>
-    /// Task:
-    /// Count how many active enrollments exist in the system.
-    ///
-    /// SQL:
-    /// SELECT COUNT(*)
-    /// FROM Enrollments
-    /// WHERE IsActive = 1;
-    /// </summary>
     public IEnumerable<string> Task07_CountActiveEnrollments()
     {
-        throw NotImplemented(nameof(Task07_CountActiveEnrollments));
+        int count = UniversityData.Enrollments.Count(e => e.IsActive);
+        return new[] { count.ToString() };
     }
 
-    /// <summary>
-    /// Task:
-    /// Return a sorted list of distinct student cities.
-    ///
-    /// SQL:
-    /// SELECT DISTINCT City
-    /// FROM Students
-    /// ORDER BY City;
-    /// </summary>
     public IEnumerable<string> Task08_DistinctStudentCities()
     {
-        throw NotImplemented(nameof(Task08_DistinctStudentCities));
+        return UniversityData.Students
+            .Select(s => s.City)
+            .Distinct()
+            .OrderBy(city => city);
     }
 
-    /// <summary>
-    /// Task:
-    /// Return the three newest enrollments.
-    /// Show the enrollment date, student identifier, and course identifier.
-    ///
-    /// SQL:
-    /// SELECT TOP 3 EnrollmentDate, StudentId, CourseId
-    /// FROM Enrollments
-    /// ORDER BY EnrollmentDate DESC;
-    /// </summary>
     public IEnumerable<string> Task09_ThreeNewestEnrollments()
     {
-        throw NotImplemented(nameof(Task09_ThreeNewestEnrollments));
+        return UniversityData.Enrollments
+            .OrderByDescending(e => e.EnrollmentDate)
+            .Take(3)
+            .Select(e => $"{e.EnrollmentDate:yyyy-MM-dd} | Student: {e.StudentId} | Course: {e.CourseId}");
     }
 
-    /// <summary>
-    /// Task:
-    /// Implement simple pagination for the course list.
-    /// Assume a page size of 2 and return the second page of data.
-    ///
-    /// SQL:
-    /// SELECT Title, Category
-    /// FROM Courses
-    /// ORDER BY Title
-    /// OFFSET 2 ROWS FETCH NEXT 2 ROWS ONLY;
-    /// </summary>
     public IEnumerable<string> Task10_SecondPageOfCourses()
     {
-        throw NotImplemented(nameof(Task10_SecondPageOfCourses));
+        return UniversityData.Courses
+            .OrderBy(c => c.Title)
+            .Skip(2)
+            .Take(2)
+            .Select(c => $"{c.Title} ({c.Category})");
     }
 
     /// <summary>
