@@ -77,100 +77,56 @@ public sealed class LinqExercises
             .Select(c => $"{c.Title} ({c.Category})");
     }
 
-    /// <summary>
-    /// Task:
-    /// Join students with enrollments by StudentId.
-    /// Return the full student name and the enrollment date.
-    ///
-    /// SQL:
-    /// SELECT s.FirstName, s.LastName, e.EnrollmentDate
-    /// FROM Students s
-    /// JOIN Enrollments e ON s.Id = e.StudentId;
-    /// </summary>
     public IEnumerable<string> Task11_JoinStudentsWithEnrollments()
     {
-        throw NotImplemented(nameof(Task11_JoinStudentsWithEnrollments));
+        return UniversityData.Students
+            .Join(UniversityData.Enrollments, 
+                s => s.Id, 
+                e => e.StudentId, 
+                (s, e) => $"{s.FirstName} {s.LastName} enrolled on {e.EnrollmentDate:yyyy-MM-dd}");
     }
 
-    /// <summary>
-    /// Task:
-    /// Prepare all student-course pairs based on enrollments.
-    /// Use an approach that flattens the data into a single result sequence.
-    ///
-    /// SQL:
-    /// SELECT s.FirstName, s.LastName, c.Title
-    /// FROM Enrollments e
-    /// JOIN Students s ON s.Id = e.StudentId
-    /// JOIN Courses c ON c.Id = e.CourseId;
-    /// </summary>
     public IEnumerable<string> Task12_StudentCoursePairs()
     {
-        throw NotImplemented(nameof(Task12_StudentCoursePairs));
+        return from e in UniversityData.Enrollments
+            join s in UniversityData.Students on e.StudentId equals s.Id
+            join c in UniversityData.Courses on e.CourseId equals c.Id
+            select $"{s.FirstName} {s.LastName} - {c.Title}";
     }
 
-    /// <summary>
-    /// Task:
-    /// Group enrollments by course and return the course title together with the number of enrollments.
-    ///
-    /// SQL:
-    /// SELECT c.Title, COUNT(*)
-    /// FROM Enrollments e
-    /// JOIN Courses c ON c.Id = e.CourseId
-    /// GROUP BY c.Title;
-    /// </summary>
     public IEnumerable<string> Task13_GroupEnrollmentsByCourse()
     {
-        throw NotImplemented(nameof(Task13_GroupEnrollmentsByCourse));
+        return from e in UniversityData.Enrollments
+            join c in UniversityData.Courses on e.CourseId equals c.Id
+            group e by c.Title into g
+            select $"{g.Key}: {g.Count()} enrollments";
     }
 
-    /// <summary>
-    /// Task:
-    /// Calculate the average final grade for each course.
-    /// Ignore records where the final grade is null.
-    ///
-    /// SQL:
-    /// SELECT c.Title, AVG(e.FinalGrade)
-    /// FROM Enrollments e
-    /// JOIN Courses c ON c.Id = e.CourseId
-    /// WHERE e.FinalGrade IS NOT NULL
-    /// GROUP BY c.Title;
-    /// </summary>
     public IEnumerable<string> Task14_AverageGradePerCourse()
     {
-        throw NotImplemented(nameof(Task14_AverageGradePerCourse));
+        return from e in UniversityData.Enrollments
+            where e.FinalGrade.HasValue
+            join c in UniversityData.Courses on e.CourseId equals c.Id
+            group e by c.Title into g
+            select $"{g.Key}: {g.Average(e => e.FinalGrade):F2}";
     }
 
-    /// <summary>
-    /// Task:
-    /// For each lecturer, count how many courses are assigned to that lecturer.
-    /// Return the full lecturer name and the course count.
-    ///
-    /// SQL:
-    /// SELECT l.FirstName, l.LastName, COUNT(c.Id)
-    /// FROM Lecturers l
-    /// LEFT JOIN Courses c ON c.LecturerId = l.Id
-    /// GROUP BY l.FirstName, l.LastName;
-    /// </summary>
     public IEnumerable<string> Task15_LecturersAndCourseCounts()
     {
-        throw NotImplemented(nameof(Task15_LecturersAndCourseCounts));
+        return UniversityData.Lecturers
+            .GroupJoin(UniversityData.Courses, 
+                l => l.Id, 
+                c => c.LecturerId, 
+                (l, courses) => $"{l.FirstName} {l.LastName}: {courses.Count()} courses");
     }
 
-    /// <summary>
-    /// Task:
-    /// For each student, find the highest final grade.
-    /// Skip students who do not have any graded enrollment yet.
-    ///
-    /// SQL:
-    /// SELECT s.FirstName, s.LastName, MAX(e.FinalGrade)
-    /// FROM Students s
-    /// JOIN Enrollments e ON s.Id = e.StudentId
-    /// WHERE e.FinalGrade IS NOT NULL
-    /// GROUP BY s.FirstName, s.LastName;
-    /// </summary>
     public IEnumerable<string> Task16_HighestGradePerStudent()
     {
-        throw NotImplemented(nameof(Task16_HighestGradePerStudent));
+        return from e in UniversityData.Enrollments
+            where e.FinalGrade.HasValue
+            join s in UniversityData.Students on e.StudentId equals s.Id
+            group e by new { s.FirstName, s.LastName } into g
+            select $"{g.Key.FirstName} {g.Key.LastName}: {g.Max(e => e.FinalGrade):F2}";
     }
 
     /// <summary>
