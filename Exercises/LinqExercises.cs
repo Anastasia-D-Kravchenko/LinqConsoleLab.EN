@@ -129,80 +129,46 @@ public sealed class LinqExercises
             select $"{g.Key.FirstName} {g.Key.LastName}: {g.Max(e => e.FinalGrade):F2}";
     }
 
-    /// <summary>
-    /// Challenge:
-    /// Find students who have more than one active enrollment.
-    /// Return the full name and the number of active courses.
-    ///
-    /// SQL:
-    /// SELECT s.FirstName, s.LastName, COUNT(*)
-    /// FROM Students s
-    /// JOIN Enrollments e ON s.Id = e.StudentId
-    /// WHERE e.IsActive = 1
-    /// GROUP BY s.FirstName, s.LastName
-    /// HAVING COUNT(*) > 1;
-    /// </summary>
     public IEnumerable<string> Challenge01_StudentsWithMoreThanOneActiveCourse()
     {
-        throw NotImplemented(nameof(Challenge01_StudentsWithMoreThanOneActiveCourse));
+        return from e in UniversityData.Enrollments
+            where e.IsActive
+            join s in UniversityData.Students on e.StudentId equals s.Id
+            group e by new { s.FirstName, s.LastName } into g
+            where g.Count() > 1
+            select $"{g.Key.FirstName} {g.Key.LastName}: {g.Count()} active courses";
     }
 
-    /// <summary>
-    /// Challenge:
-    /// List the courses that start in April 2026 and do not have any final grades assigned yet.
-    ///
-    /// SQL:
-    /// SELECT c.Title
-    /// FROM Courses c
-    /// JOIN Enrollments e ON c.Id = e.CourseId
-    /// WHERE MONTH(c.StartDate) = 4 AND YEAR(c.StartDate) = 2026
-    /// GROUP BY c.Title
-    /// HAVING SUM(CASE WHEN e.FinalGrade IS NOT NULL THEN 1 ELSE 0 END) = 0;
-    /// </summary>
     public IEnumerable<string> Challenge02_AprilCoursesWithoutFinalGrades()
     {
-        throw NotImplemented(nameof(Challenge02_AprilCoursesWithoutFinalGrades));
+        return from c in UniversityData.Courses
+            where c.StartDate.Year == 2026 && c.StartDate.Month == 4
+            join e in UniversityData.Enrollments on c.Id equals e.CourseId
+            group e by c.Title into g
+            where g.All(e => !e.FinalGrade.HasValue) // Or `g.Count(e => e.FinalGrade.HasValue) == 0`
+            select g.Key;
     }
 
-    /// <summary>
-    /// Challenge:
-    /// Calculate the average final grade for every lecturer across all of their courses.
-    /// Ignore missing grades but still keep the lecturers in mind as the reporting dimension.
-    ///
-    /// SQL:
-    /// SELECT l.FirstName, l.LastName, AVG(e.FinalGrade)
-    /// FROM Lecturers l
-    /// LEFT JOIN Courses c ON c.LecturerId = l.Id
-    /// LEFT JOIN Enrollments e ON e.CourseId = c.Id
-    /// WHERE e.FinalGrade IS NOT NULL
-    /// GROUP BY l.FirstName, l.LastName;
-    /// </summary>
     public IEnumerable<string> Challenge03_LecturersAndAverageGradeAcrossTheirCourses()
     {
-        throw NotImplemented(nameof(Challenge03_LecturersAndAverageGradeAcrossTheirCourses));
+        // By putting the enrollments mapping into a 'let' clause, we keep ALL lecturers 
+        // as a reporting dimension instead of stripping them in an INNER JOIN / WHERE layer.
+        return from l in UniversityData.Lecturers
+            let grades = from c in UniversityData.Courses
+                where c.LecturerId == l.Id
+                join e in UniversityData.Enrollments on c.Id equals e.CourseId
+                where e.FinalGrade.HasValue
+                select e.FinalGrade.Value
+            select $"{l.FirstName} {l.LastName}: {(grades.Any() ? grades.Average().ToString("F2") : "N/A")}";
     }
 
-    /// <summary>
-    /// Challenge:
-    /// Show student cities and the number of active enrollments created by students from each city.
-    /// Sort the result by the active enrollment count in descending order.
-    ///
-    /// SQL:
-    /// SELECT s.City, COUNT(*)
-    /// FROM Students s
-    /// JOIN Enrollments e ON s.Id = e.StudentId
-    /// WHERE e.IsActive = 1
-    /// GROUP BY s.City
-    /// ORDER BY COUNT(*) DESC;
-    /// </summary>
     public IEnumerable<string> Challenge04_CitiesAndActiveEnrollmentCounts()
     {
-        throw NotImplemented(nameof(Challenge04_CitiesAndActiveEnrollmentCounts));
-    }
-
-    private static NotImplementedException NotImplemented(string methodName)
-    {
-        return new NotImplementedException(
-            $"Complete method {methodName} in Exercises/LinqExercises.cs and run the command again.");
+        return from s in UniversityData.Students
+            join e in UniversityData.Enrollments on s.Id equals e.StudentId
+            where e.IsActive
+            group e by s.City into g
+            orderby g.Count() descending
+            select $"{g.Key}: {g.Count()}";
     }
 }
