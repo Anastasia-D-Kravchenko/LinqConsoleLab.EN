@@ -11,18 +11,10 @@ public sealed class LinqExercises
             .Select(s => $"{s.IndexNumber} - {s.FirstName} {s.LastName}");
     }
 
-    /// <summary>
-    /// Task:
-    /// Build a list of all student email addresses.
-    /// Use projection so that you do not return whole objects.
-    ///
-    /// SQL:
-    /// SELECT Email
-    /// FROM Students;
-    /// </summary>
     public IEnumerable<string> Task02_StudentEmailAddresses()
     {
-        throw NotImplemented(nameof(Task02_StudentEmailAddresses));
+        return UniversityData.Students
+            .Select(s => s.Email);
     }
 
     /// <summary>
