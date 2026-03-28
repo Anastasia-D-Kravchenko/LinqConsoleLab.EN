@@ -17,19 +17,12 @@ public sealed class LinqExercises
             .Select(s => s.Email);
     }
 
-    /// <summary>
-    /// Task:
-    /// Sort students alphabetically by last name and then by first name.
-    /// Return the index number and full name.
-    ///
-    /// SQL:
-    /// SELECT IndexNumber, FirstName, LastName
-    /// FROM Students
-    /// ORDER BY LastName, FirstName;
-    /// </summary>
     public IEnumerable<string> Task03_StudentsSortedAlphabetically()
     {
-        throw NotImplemented(nameof(Task03_StudentsSortedAlphabetically));
+        return UniversityData.Students
+            .OrderBy(s => s.LastName)
+            .ThenBy(s => s.FirstName)
+            .Select(s => $"{s.IndexNumber} - {s.FirstName} {s.LastName}");
     }
 
     /// <summary>
