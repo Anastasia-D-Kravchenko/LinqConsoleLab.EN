@@ -34,36 +34,16 @@ public sealed class LinqExercises
             : new[] { "No Analytics course found." };
     }
 
-    /// <summary>
-    /// Task:
-    /// Check whether there is at least one inactive enrollment in the data set.
-    /// Return one line with a True/False or Yes/No answer.
-    ///
-    /// SQL:
-    /// SELECT CASE WHEN EXISTS (
-    ///     SELECT 1
-    ///     FROM Enrollments
-    ///     WHERE IsActive = 0
-    /// ) THEN 1 ELSE 0 END;
-    /// </summary>
     public IEnumerable<string> Task05_IsThereAnyInactiveEnrollment()
     {
-        throw NotImplemented(nameof(Task05_IsThereAnyInactiveEnrollment));
+        bool hasInactive = UniversityData.Enrollments.Any(e => !e.IsActive);
+        return new[] { hasInactive ? "Yes" : "No" };
     }
 
-    /// <summary>
-    /// Task:
-    /// Check whether every lecturer has a department assigned.
-    /// Use a method that validates the condition for the whole collection.
-    ///
-    /// SQL:
-    /// SELECT CASE WHEN COUNT(*) = COUNT(Department)
-    /// THEN 1 ELSE 0 END
-    /// FROM Lecturers;
-    /// </summary>
     public IEnumerable<string> Task06_DoAllLecturersHaveDepartment()
     {
-        throw NotImplemented(nameof(Task06_DoAllLecturersHaveDepartment));
+        bool allHaveDepartment = UniversityData.Lecturers.All(l => !string.IsNullOrWhiteSpace(l.Department));
+        return new[] { allHaveDepartment ? "Yes" : "No" };
     }
 
     /// <summary>
